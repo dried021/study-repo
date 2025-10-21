@@ -35,3 +35,17 @@ def test(model, dataloaders, device, max_wrong_examples=5):
 
   accuracy = 100*correct / total
   return accuracy, wrong_examples
+
+
+def predict_batch(model, dataloader, device):
+    model.eval()
+    
+    dataiter = iter(dataloader)
+    images, labels = next(dataiter)
+    images = images.to(device)
+    
+    with torch.no_grad():
+        outputs = model(images)
+        _, predicted = torch.max(outputs, 1)
+    
+    return predicted, labels
