@@ -17,7 +17,7 @@ def plot_training_history(history, dataset_name, save_path=None):
     ax1.set_ylabel('Accuracy', fontsize=12)
     ax1.set_title(f'{dataset_name} Training and Validation Accuracy',
                   fontsize=14, fontweight='bold')
-    ax1.legend(frontsize=11)
+    ax1.legend(fontsize=11)
     ax1.grid(True, alpha=0.3)
 
     # Loss
