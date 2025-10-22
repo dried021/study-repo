@@ -20,7 +20,11 @@ def main():
     
     # MNIST 모델 로드
     mnist_model, _ = initialize_model("alexnet", num_classes, feature_extract)
+
+    # model을 device(cpu/gpu)로 이동
     mnist_model = mnist_model.to(device)
+
+    # train 결과를 불러옴
     mnist_checkpoint = torch.load(f'{save_dir}/mnist_alexnet_best.pth')
     mnist_model.load_state_dict(mnist_checkpoint['model_state_dict'])
     mnist_model.eval()
@@ -80,6 +84,7 @@ def main():
     
     # 학습 히스토리 시각화 (이미 저장된 것 로드)
     from src.visualization import plot_training_history
+    
     plot_training_history(
         mnist_checkpoint['history'], 
         'MNIST',

@@ -90,7 +90,7 @@ def main():
     }, f'{save_dir}/cifar_alexnet_best.pth')
     print(f"CIFAR-10 model saved to {save_dir}/cifar_alexnet_best.pth")
     
-    # 학습 결과 시각화
+    # 학습 결과 시각화/저장
     plot_training_history(
         cifar_history, 
         'CIFAR-10', 

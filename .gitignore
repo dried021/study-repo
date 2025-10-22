@@ -1,2 +1,6 @@
 data/
+saved_models/
+results/
+temp/
+
 __pycache__/ 
