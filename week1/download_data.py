@@ -3,7 +3,10 @@ import os
 from torchvision import datasets
 from tqdm import tqdm
 
+# CustomDataset을 정의하기 위해 데이터 다운로드 
 def prepare_mnist_data(save_dir='./data'):
+    # 데이터 저장 경로 지정
+
     print("Downloading MNIST dataset...")
     
     # 원본 데이터 다운로드
@@ -16,11 +19,12 @@ def prepare_mnist_data(save_dir='./data'):
     train_labels = []
     
     for img, label in tqdm(train_dataset):
-        train_images.append(np.array(img))
+        # tqdm: python 진행률 프로세스바
+        train_images.append(np.array(img)) # PIL Image 형식의 img를 numpy 배열로 변환
         train_labels.append(label)
     
-    train_images = np.array(train_images)
-    train_labels = np.array(train_labels)
+    train_images = np.array(train_images) # list -> numpy 배열 (60000, 28, 28)
+    train_labels = np.array(train_labels) # list -> (60000, )
     
     # Test 데이터 변환
     print("Converting MNIST test data...")
@@ -38,6 +42,8 @@ def prepare_mnist_data(save_dir='./data'):
     os.makedirs(save_dir, exist_ok=True)
     
     print("Saving MNIST train data...")
+    # npz로 압축해서 저장
+    # 변수 train_images, train_labels 저장
     np.savez_compressed(
         os.path.join(save_dir, 'mnist_train.npz'),
         images=train_images,
