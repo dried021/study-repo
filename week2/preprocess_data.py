@@ -42,9 +42,11 @@ def preprocess_data(file_path):
     reviews_cleaned = [preprocess_text(review) for review in tqdm(reviews)]
 
     # uncased: 입력 단어를 소문자로 만들고 accent marks를 없앰
-    # tokenizer = BertTokenizer.from_pretrained('bert-base-uncased') : 적합하지 않음
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    # 최대 512 토큰까지 처리 가능
+
     # LongformerTokenizer: Transformer 기반, 4096토큰까지 처리 가능
-    tokenizer = LongformerTokenizer.from_pretrained('allenai/longformer-base-4096')
+    # tokenizer = LongformerTokenizer.from_pretrained('allenai/longformer-base-4096')
     
     # 인코딩
     '''
@@ -63,7 +65,7 @@ def preprocess_data(file_path):
             batch,
             padding='max_length',
             truncation=True,
-            max_length=3000, # 최대 토큰 길이가 2734이므로
+            max_length=512, # 최대 토큰 길이는 2734이지만 BERT 한계
             return_tensors='np'
         )
         encoded_list.append(encoded_batch)

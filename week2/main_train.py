@@ -2,8 +2,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import os
-from transformers import BartModel, LongformerModel
+from transformers import BartModel, LongformerForSequenceClassification, BertModel
 from src.visualization import plot_training_history
+from src.model import initialize_model
 
 from config import device, save_dir, results_dir, data_dir, batch_size, num_labels, learning_rate, momentum, num_epochs
 
@@ -17,13 +18,11 @@ def main(model_type):
     print(f"Using device: {device}")
     print("-"*50)
 
-    imdb_dataloaders = get_imdb_dataloaders(data_dir, batch_size, device=str(device))
+    imdb_dataloaders, test_data = get_imdb_dataloaders(data_dir, batch_size, device=str(device))
 
-    if (model_type == 'longformer'):
-        model = LongformerModel.from_pretrained('allenai/longformer-base-4096', num_labels=num_labels)
-    else:
-        model = BartModel.from_pretrained('facebook/bart-base', num_labels=num_labels)
-
+    model = initialize_model(model_type, num_labels)
+    model = model.to(device)
+    
     optimizer = optim.SGD(model.parameters(), lr = learning_rate, momentum=momentum)
     criterion = nn.CrossEntropyLoss()
 
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Choose Model: Longformer, BART')
-    parser.add_argument('--model', type=str, default = 'longformer')
+    parser.add_argument('--model', type=str, default = 'bert')
     args = parser.parse_args()
 
     main(args.model)

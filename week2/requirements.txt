@@ -5,3 +5,5 @@ pillow
 matplotlib
 numpy
 tqdm
+pandas
+scikit-learn

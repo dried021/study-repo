@@ -1,6 +1,7 @@
 saved_models/
 results/
 temp/
+jupyter-notebooks/
 
 # Python
 __pycache__/
