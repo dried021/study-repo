@@ -4,7 +4,6 @@ import pandas as pd
 
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from torchvision import transforms, utils
 
 
 # 참고: https://docs.pytorch.org/tutorials/beginner/data_loading_tutorial.html
@@ -22,7 +21,7 @@ class IMDBDataset(Dataset):
         self.data_type = data_type
 
         if data_type == 'train':
-            data_file = os.path.join(data_dir, 'imdb_train')
+            data_file = os.path.join(data_dir, 'imdb_train.npz')
         elif data_type == 'val':
             data_file = os.path.join(data_dir, 'imdb_val.npz')
         else:
@@ -39,9 +38,9 @@ class IMDBDataset(Dataset):
     
     def __getitem__(self, index):
         return {
-            'input_ids': self.input_ids[index],
-            'attention_mask': self.attention_mask[index],
-            'labels': self.labels[index]
+            'input_ids': torch.tensor(self.input_ids[index], dtype=torch.long),
+            'attention_mask': torch.tensor(self.attention_mask[index], dtype=torch.long),
+            'labels': torch.tensor(self.labels[index], dtype=torch.long)
         }
     
 def get_imdb_dataloaders(data_dir, batch_size=32, device='cpu'):
@@ -73,14 +72,14 @@ def get_imdb_dataloaders(data_dir, batch_size=32, device='cpu'):
         'val': DataLoader(
             val_dataset,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=False,
             num_workers=0,
             pin_memory=use_pin_memory
         ),
         'test': DataLoader(
             test_dataset,
             batch_size=batch_size,
-            shuffle=True,
+            shuffle=False,
             num_workers=0,
             pin_memory=use_pin_memory
         )
