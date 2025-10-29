@@ -2,10 +2,11 @@
 import torch
 import time
 import copy
+from tqdm import tqdm
 
 # 참고: https://github.com/Prerna5194/IMDB_BERT_TRANSFORMER/blob/master/IMDB_MovieReviews_Classifier.ipynb
 
-def train(model, dataloaders, criterion, optimizer, device, num_epochs=10):
+def train(model, dataloaders, criterion, optimizer, device, scheduler, num_epochs=10):
     '''
     model: transformers 모델
 
@@ -20,6 +21,14 @@ def train(model, dataloaders, criterion, optimizer, device, num_epochs=10):
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
+    print("="*70)
+    print("MODEL DEBUG INFO:")
+    print(f"Total parameters: {sum(p.numel() for p in model.parameters()):,}")
+    print(f"Trainable parameters: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
+    if hasattr(model, 'encoder') and hasattr(model.encoder, 'token_embedding'):
+        print(f"Vocab size: {model.encoder.token_embedding.num_embeddings}")
+    print("="*70)
+
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs-1))
         print('-'*20)
@@ -33,10 +42,18 @@ def train(model, dataloaders, criterion, optimizer, device, num_epochs=10):
             running_loss = 0.0
             running_corrects = 0
 
-            for data in dataloaders[phase]:
+            pbar = tqdm(
+                dataloaders[phase], 
+                desc=f"{phase.upper():5s}",
+                total=len(dataloaders[phase])
+            )
+
+            for data in enumerate(pbar):
                 input_ids = data['input_ids'].to(device)
                 attention_mask = data['attention_mask'].to(device)
                 labels = data['labels'].to(device)
+
+
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase=='train'):
@@ -58,6 +75,7 @@ def train(model, dataloaders, criterion, optimizer, device, num_epochs=10):
             print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             if phase == 'train':
+                scheduler.step()
                 train_loss_history.append(epoch_loss)
                 train_acc_history.append(epoch_acc)
             else:
