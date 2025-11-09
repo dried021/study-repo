@@ -29,7 +29,7 @@ def main(model_type):
     model.load_state_dict(model_checkpoint['model_state_dict'])
     model.eval()
 
-    print(f"BERT Model Loaded")
+    print(f"{model_type.upper()} Model Loaded")
     print(f"  - Best Accuracy: {model_checkpoint['best_acc']:.4f}")
     print(f"  - Trained Epochs: {model_checkpoint['epoch']}")
 
