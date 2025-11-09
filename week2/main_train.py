@@ -36,7 +36,7 @@ def main(model_type):
     if model_type == "bert":
         optimizer = AdamW(
                 model.parameters(),
-                lr=2e-5,
+                lr=learning_rate,
                 eps=1e-8,
                 weight_decay=0.01
             )
@@ -51,7 +51,7 @@ def main(model_type):
     elif model_type == "transformer":
         optimizer = AdamW(
             model.parameters(),
-            lr = 1e-4,
+            lr = learning_rate,
             betas = (0.9, 0.98),
             eps = 1e-9)
 
