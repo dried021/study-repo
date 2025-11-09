@@ -48,7 +48,13 @@ def train(model, dataloaders, criterion, optimizer, device, scheduler, num_epoch
                 total=len(dataloaders[phase])
             )
 
-            for data in enumerate(pbar):
+            '''
+                batch_idx가 없으면 에러가 남: enumerate(pbar)를 하면 (0, {'input_ids':...}) 이런 식으로 오기 때문에
+                batch_idx를 넣거나 for data in pbar를 해야 함 ...
+
+                enumerate(iterable)은 (index, value) 튜플을 반환
+            '''
+            for batch_idx, data in enumerate(pbar):
                 input_ids = data['input_ids'].to(device)
                 attention_mask = data['attention_mask'].to(device)
                 labels = data['labels'].to(device)

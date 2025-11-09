@@ -176,29 +176,22 @@ def preprocess_data(file_path, data_dir):
 def save_array(arrays, data_dir='./data', data_type=''):
     os.makedirs(data_dir, exist_ok=True)
     
-    print("Saving IMDB train data...")
-    np.savez_compressed(
-        os.path.join(data_dir, f'imdb_train_{data_type}.npz'),
-        input_ids = arrays['train']['input_ids'],
-        attention_mask = arrays['train']['attention_mask'],
-        labels = arrays['train']['labels']
-    )
-
-    print("Saving IMDB validation data...")
-    np.savez_compressed(
-        os.path.join(data_dir, f'imdb_val_{data_type}.npz'),
-        input_ids = arrays['val']['input_ids'],
-        attention_mask = arrays['val']['attention_mask'],
-        labels = arrays['val']['labels']
-    )
-
-    print("Saving IMDB test data...")
-    np.savez_compressed(
-        os.path.join(data_dir, f'imdb_test_{data_type}.npz'),
-        input_ids = arrays['test']['input_ids'],
-        attention_mask = arrays['test']['attention_mask'],
-        labels = arrays['test']['labels']
-    )
+    for split in ['train', 'val', 'test']:
+        print(f"Saving IMDB {split} data ({data_type})...")
+        
+        save_dict = {
+            'input_ids': arrays[split]['input_ids'],
+            'labels': arrays[split]['labels']
+        }
+        
+        # attention_mask가 있을 때만 저장 (BERT만)
+        if arrays[split]['attention_mask'] is not None:
+            save_dict['attention_mask'] = arrays[split]['attention_mask']
+        
+        np.savez_compressed(
+            os.path.join(data_dir, f'imdb_{split}_{data_type}.npz'),
+            **save_dict
+        )
 
 
 def check_dataset_distrib():
