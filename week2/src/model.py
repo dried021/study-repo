@@ -11,13 +11,19 @@ class TransformerClassifier(nn.Module):
     def __init__(self, vocab_size, n_classes=2, **encoder_params):
         super().__init__()
         self.encoder = TransformerEncoder(vocab_size, **encoder_params)
-        self.cls_head = nn.Linear(encoder_params['d_model'], n_classes)
+        self.linear = nn.Linear(encoder_params['d_model'], n_classes)
 
     def forward(self, input_ids, attention_mask=None):
         # [batch_size, seq_len, d_model]
         enc_out = self.encoder(input_ids)  
+
+        # cls token
         cls_token = enc_out[:, 0, :]     # <sos> 토큰 사용
-        logits = self.cls_head(cls_token)
+        logits = self.linear(cls_token)
+
+        # Max pool
+        # pooled = enc_out.max(dim=1)[0]
+        # logits = self.linear(pooled)
         return logits
 
 

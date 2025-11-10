@@ -6,8 +6,9 @@ import numpy as np
 import os
 
 from src.vocabulary import RNNTokenizer
+from src.visualization import visualize_unk_ratio
 
-from config import data_dir, train_ratio, val_ratio, vocab_size
+from config import data_dir, train_ratio, val_ratio, vocab_size, results_dir
 import re
 
 
@@ -21,6 +22,10 @@ def preprocess_text(text):
     text = re.sub(r'<.*?>', '', text) # 일반 HTML 태그 제거
 
     # 영문자/숫자/공백/문장부호 제외 제거
+    # text = re.sub(r'[^a-zA-Z0-9\s.,!?]', '', text)
+
+    # 문장 부호가 있으면 앞 뒤로 공백 추가
+    text = re.sub(r'([.,!?])', r' \1 ', text)
     text = re.sub(r'[^a-zA-Z0-9\s.,!?]', '', text)
     
     # 연속 공백 제거
@@ -151,6 +156,8 @@ def preprocess_data(file_path, data_dir):
     tokenizer_rnn = RNNTokenizer(vocab_size=vocab_size)
     tokenizer_rnn.build_vocab(splits['train']['reviews'])
     tokenizer_rnn.save_vocab("./data/tokenizer_rnn.json")
+
+    visualize_unk_ratio(splits['train']['reviews'], tokenizer_rnn, max_length=512, save_path=f'{results_dir}/unk_ratio_analysis.png')
 
     rnn_arrays = {}
 
