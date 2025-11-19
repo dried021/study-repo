@@ -1,0 +1,15 @@
+sacrebleu
+torch>=2.0.0
+torchvision
+torchaudio
+torchtext>=0.15.0
+torchdata
+spacy>=3.0.0
+altair
+GPUtil
+tqdm
+matplotlib
+numpy
+pandas
+sacrebleu
+rouge-score
