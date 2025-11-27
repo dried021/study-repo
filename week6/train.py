@@ -205,8 +205,8 @@ def train_model(config):
             loss = loss_fn(proj_output.view(-1, tokenizer_tgt.get_vocab_size()), label.view(-1))
             batch_iterator.set_postfix({f"Loss": f"{loss.item():6.3f}"})
 
-            writer.add_scalar('train loss', loss.item(), global_step)
-            writer.flush()
+            # writer.add_scalar('train loss', loss.item(), global_step)
+            # writer.flush()
 
             loss.backward()
 
@@ -217,13 +217,18 @@ def train_model(config):
             num_batches += 1
             global_step += 1
 
+
         avg_epoch_loss = epoch_loss / num_batches
         print(f"\nEpoch {epoch} Average Loss: {avg_epoch_loss:.4f}")
+        
+        writer.add_scalar('train loss', avg_epoch_loss, epoch)
+        writer.flush()
+
 
         avg_val_loss = run_validation(model, validation_dataloader, tokenizer_src, tokenizer_tgt, config['seq_len'], device, lambda msg: batch_iterator.write(msg), global_step, writer)
         print(f"Epoch {epoch} Average Validation Loss: {avg_val_loss:.4f}")
 
-        writer.add_scalar('validation loss', avg_val_loss, global_step)
+        writer.add_scalar('validation loss', avg_val_loss, epoch)
         writer.flush()
 
         if avg_val_loss < best_loss:

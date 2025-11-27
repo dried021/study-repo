@@ -403,7 +403,10 @@ class Encoder(nn.Module):
         """
         super().__init__()
         self.layers = layers
-        self.norm  = LayerNormalization()
+        self.layer_norms  = nn.ModuleList([LayerNormalization() for _ in range(len(layers))])
+
+        # parallel transformer
+        self.output = []
 
     def forward(self, x, mask):
         """ Forward function for encoder layer.
@@ -417,11 +420,18 @@ class Encoder(nn.Module):
         Returns:
             A tensor representing the output of the encoder layer.
         """
+        # 매 forward마다 초기화!
+        self.output = []
 
         # modulelist를 실행시킴
-        for layer in self.layers:
+        for i, layer in enumerate(self.layers):
             x = layer(x, mask)
-        return self.norm(x)
+            x = self.layer_norms[i](x)
+
+            # parallel transformer
+            self.output.append(x)
+
+        return self.output
     
 class DecoderBlock(nn.Module):
     """ Create an instance for decoder block component.
@@ -511,8 +521,12 @@ class Decoder(nn.Module):
         Returns:
             A tensor representing the output of the decoder layer.
         """
-        for layer in self.layers:
-            x = layer(x, encoder_output, src_mask, tgt_mask)
+        assert len(encoder_output) == len(self.layers), \
+            f"Encoder outputs ({len(encoder_output)}) must match decoder layers ({len(self.layers)})"
+        
+        for i, layer in enumerate(self.layers):
+            # parallel transformer
+            x = layer(x, encoder_output[i], src_mask, tgt_mask)
         return self.norm(x)
 
 class ProjectionLayer(nn.Module):
